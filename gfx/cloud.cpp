@@ -116,10 +116,11 @@ void Cloud::drawClipped(int b1x, int b1y, int b1w, int b1h,
       int srcY = r.sy + row;
       for (int col = 0; col < r.w; col++) {
         int srcX = r.sx + col;
-        int srcIdx = srcY * _width + srcX;
-        int maskByte = _mask[srcIdx / 8];
-        if (maskByte & (0x80 >> (srcIdx % 8))) {
-          display->drawPixel(r.x + col, r.y + row, _sprite[srcIdx]);
+        int spriteIdx = srcY * _width + srcX;
+        int maskIdx = srcY * bw + srcX / 8;
+        int maskBit = 0x80 >> (srcX % 8);
+        if (_mask[maskIdx] & maskBit) {
+          display->drawPixel(r.x + col, r.y + row, _sprite[spriteIdx]);
         }
       }
     }
