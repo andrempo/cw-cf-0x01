@@ -1,9 +1,6 @@
 
 #include "Clockface.h"
 
-// Forward declaration
-bool cloudsOverlapBlock(Cloud& cloud, Block& block);
-
 EventBus eventBus;
 
 const char* FORMAT_TWO_DIGITS = "%02d";
@@ -52,27 +49,11 @@ void Clockface::setup(CWDateTime *dateTime) {
 }
 
 void Clockface::update() {
-  // Move clouds first (clears old position with sky color, draws at new)
   cloud1.update();
   cloud2.update();
 
-  // Blocks draw/update on top (they clear+redraw themselves every frame)
   hourBlock.update();
   minuteBlock.update();
-
-  // If a cloud moved over a block, redraw that block on top
-  if (cloudsOverlapBlock(cloud1, hourBlock)) {
-    Locator::getDisplay()->drawRGBBitmap(hourBlock.getX(), hourBlock.getY(), BLOCK, 19, 19);
-  }
-  if (cloudsOverlapBlock(cloud1, minuteBlock)) {
-    Locator::getDisplay()->drawRGBBitmap(minuteBlock.getX(), minuteBlock.getY(), BLOCK, 19, 19);
-  }
-  if (cloudsOverlapBlock(cloud2, hourBlock)) {
-    Locator::getDisplay()->drawRGBBitmap(hourBlock.getX(), hourBlock.getY(), BLOCK, 19, 19);
-  }
-  if (cloudsOverlapBlock(cloud2, minuteBlock)) {
-    Locator::getDisplay()->drawRGBBitmap(minuteBlock.getX(), minuteBlock.getY(), BLOCK, 19, 19);
-  }
 
   mario.update();
 
@@ -80,8 +61,6 @@ void Clockface::update() {
     mario.jump();
     updateTime();
     lastMillis = millis();
-
-    //Serial.println(_dateTime->getFormattedTime());
   }
 }
 
@@ -95,11 +74,4 @@ void Clockface::externalEvent(int type) {
     mario.jump();
     updateTime();
   }
-}
-
-bool cloudsOverlapBlock(Cloud& cloud, Block& block) {
-  return cloud.getX() < block.getX() + block.getWidth() &&
-         cloud.getX() + cloud.getWidth() > block.getX() &&
-         cloud.getY() < block.getY() + block.getHeight() &&
-         cloud.getY() + cloud.getHeight() > block.getY();
 }
