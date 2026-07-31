@@ -9,8 +9,8 @@ const char* FORMAT_TWO_DIGITS = "%02d";
 Tile ground(GROUND, 8, 8); 
 
 Object bush(BUSH, 21, 9);
-Object cloud1(CLOUD1, 13, 12);
-Object cloud2(CLOUD2, 13, 12);
+Cloud cloud1(CLOUD_NEW, CLOUD_MASK, 20, 15, 0, 21, 1000);
+Cloud cloud2(CLOUD_NEW, CLOUD_MASK, 20, 15, 51, 7, 2000);
 Object hill(HILL, 20, 22);
 
 
@@ -37,8 +37,8 @@ void Clockface::setup(CWDateTime *dateTime) {
 
   bush.draw(43, 47);
   hill.draw(0, 34);
-  cloud1.draw(0, 21);
-  cloud2.draw(51, 7);
+  cloud1.init();
+  cloud2.init();
 
   updateTime();
 
@@ -51,6 +51,8 @@ void Clockface::setup(CWDateTime *dateTime) {
 void Clockface::update() {
   hourBlock.update();
   minuteBlock.update();
+  cloud1.update();
+  cloud2.update();
   mario.update();
 
   if (_dateTime->getSecond() == 0 && millis() - lastMillis > 1000) {

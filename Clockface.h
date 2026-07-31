@@ -17,6 +17,7 @@
 #include "gfx/assets.h"
 #include "gfx/mario.h"
 #include "gfx/block.h"
+#include "gfx/cloud.h"
 
 class Clockface: public IClockface {
   private:
