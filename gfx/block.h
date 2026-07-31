@@ -34,8 +34,12 @@ class Block: public Sprite, public EventTask {
     Block(int x, int y);
     void setText(String text);
     void init();
-    void update();    
+    void update();
     const char* name();
     void execute(EventType event, Sprite* caller);
+    int getX();
+    int getY();
+    int getWidth();
+    int getHeight();
 
 };

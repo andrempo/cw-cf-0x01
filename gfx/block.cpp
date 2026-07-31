@@ -113,3 +113,8 @@ void Block::execute(EventType event, Sprite* caller) {
 const char* Block::name() {
   return "BLOCK";
 }
+
+int Block::getX() { return _x; }
+int Block::getY() { return _y; }
+int Block::getWidth() { return _width; }
+int Block::getHeight() { return _height; }

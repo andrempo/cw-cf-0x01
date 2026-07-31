@@ -19,4 +19,8 @@ class Cloud: public Sprite, public EventTask {
     void update();
     void execute(EventType event, Sprite* caller);
     const char* name();
+    int getX();
+    int getY();
+    int getWidth();
+    int getHeight();
 };

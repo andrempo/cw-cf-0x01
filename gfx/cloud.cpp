@@ -47,3 +47,8 @@ void Cloud::execute(EventType event, Sprite* caller) {
 const char* Cloud::name() {
   return "CLOUD";
 }
+
+int Cloud::getX() { return _x; }
+int Cloud::getY() { return _y; }
+int Cloud::getWidth() { return _width; }
+int Cloud::getHeight() { return _height; }
