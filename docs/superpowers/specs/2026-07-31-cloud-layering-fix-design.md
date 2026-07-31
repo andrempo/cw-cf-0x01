@@ -85,7 +85,41 @@ void Cloud::getClipRegions(int bx, int by, int bw, int bh,
 }
 ```
 
-### 4. drawClipped()
+### 4. getClipRegionAgainst() (private helper)
+
+Takes an existing `ClipRegion` (a sub-rectangle of the cloud) and clips it against a block, producing up to 4 smaller regions. Same algorithm as `getClipRegions`, but operates on an arbitrary rectangle rather than the cloud's full bbox.
+
+```cpp
+void Cloud::getClipRegionAgainst(ClipRegion& input, Block& block,
+                                  ClipRegion out[], int& outCount) {
+  int bx = block._x, by = block._y, bw = block._width, bh = block._height;
+  int ix = max(input.x, bx);
+  int iy = max(input.y, by);
+  int ix2 = min(input.x + input.w, bx + bw);
+  int iy2 = min(input.y + input.h, by + bh);
+
+  if (ix >= ix2 || iy >= iy2) {
+    out[0] = input;
+    outCount = 1;
+    return;
+  }
+
+  outCount = 0;
+  if (iy > input.y)
+    out[outCount++] = {input.x, input.y, input.w, iy - input.y, input.sx, input.sy};
+  if (iy2 < input.y + input.h)
+    out[outCount++] = {input.x, iy2, input.w, (input.y + input.h) - iy2,
+                       input.sx, input.sy + (iy2 - input.y)};
+  if (ix > input.x)
+    out[outCount++] = {input.x, iy, ix - input.x, iy2 - iy,
+                       input.sx, input.sy + (iy - input.y)};
+  if (ix2 < input.x + input.w)
+    out[outCount++] = {ix2, iy, (input.x + input.w) - ix2, iy2 - iy,
+                       input.sx + (ix2 - input.x), input.sy + (iy - input.y)};
+}
+```
+
+### 5. drawClipped()
 
 For each clip region, draw the cloud sprite using `drawRGBBitmap` with adjusted source and destination coordinates:
 
@@ -118,7 +152,7 @@ void Cloud::drawClipped(Block& block1, Block& block2) {
 }
 ```
 
-### 5. clearOldPosition()
+### 6. clearOldPosition()
 
 Same clipping logic, but uses `fillRect(SKY_COLOR)` instead of `drawRGBBitmap`.
 
