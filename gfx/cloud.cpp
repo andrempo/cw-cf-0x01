@@ -1,5 +1,6 @@
 #include "cloud.h"
 #include <Locator.h>
+#include <Adafruit_GFX.h>
 #include "assets.h"
 
 Cloud::Cloud(const unsigned short* sprite, const uint8_t* mask, int width, int height,
@@ -105,12 +106,23 @@ void Cloud::drawClipped(int b1x, int b1y, int b1w, int b1h,
       final[finalCount++] = sub[j];
   }
 
+  Adafruit_GFX* display = Locator::getDisplay();
+  int bw = (_width + 7) / 8; // bitmask bytes per row
+
   for (int i = 0; i < finalCount; i++) {
     ClipRegion& r = final[i];
-    if (r.w > 0 && r.h > 0)
-      Locator::getDisplay()->drawRGBBitmap(r.x, r.y,
-        _sprite + r.sy * _width + r.sx, _mask + r.sy * _width + r.sx,
-        r.w, r.h);
+    if (r.w <= 0 || r.h <= 0) continue;
+    for (int row = 0; row < r.h; row++) {
+      int srcY = r.sy + row;
+      for (int col = 0; col < r.w; col++) {
+        int srcX = r.sx + col;
+        int srcIdx = srcY * _width + srcX;
+        int maskByte = _mask[srcIdx / 8];
+        if (maskByte & (0x80 >> (srcIdx % 8))) {
+          display->drawPixel(r.x + col, r.y + row, _sprite[srcIdx]);
+        }
+      }
+    }
   }
 }
 
