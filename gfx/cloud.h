@@ -26,6 +26,10 @@ class Cloud: public Sprite, public EventTask {
           int startX, int startY, int interval);
     void init();
     void update();
+    void clearOldPosition(int b1x, int b1y, int b1w, int b1h,
+                          int b2x, int b2y, int b2w, int b2h);
+    void drawClipped(int b1x, int b1y, int b1w, int b1h,
+                     int b2x, int b2y, int b2w, int b2h);
     void execute(EventType event, Sprite* caller);
     const char* name();
     int getX();

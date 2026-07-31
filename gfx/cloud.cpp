@@ -66,6 +66,54 @@ void Cloud::getClipRegionAgainst(ClipRegion& input, int bx, int by, int bw, int 
                        input.sx + (ix2 - input.x), input.sy + (iy - input.y)};
 }
 
+void Cloud::clearOldPosition(int b1x, int b1y, int b1w, int b1h,
+                             int b2x, int b2y, int b2w, int b2h) {
+  ClipRegion regions[16];
+  int count = 0;
+  getClipRegions(b1x, b1y, b1w, b1h, regions, count);
+
+  ClipRegion final[16];
+  int finalCount = 0;
+  for (int i = 0; i < count; i++) {
+    ClipRegion sub[4];
+    int subCount = 0;
+    getClipRegionAgainst(regions[i], b2x, b2y, b2w, b2h, sub, subCount);
+    for (int j = 0; j < subCount; j++)
+      final[finalCount++] = sub[j];
+  }
+
+  for (int i = 0; i < finalCount; i++) {
+    ClipRegion& r = final[i];
+    if (r.w > 0 && r.h > 0)
+      Locator::getDisplay()->fillRect(r.x, r.y, r.w, r.h, SKY_COLOR);
+  }
+}
+
+void Cloud::drawClipped(int b1x, int b1y, int b1w, int b1h,
+                        int b2x, int b2y, int b2w, int b2h) {
+  ClipRegion regions[16];
+  int count = 0;
+  getClipRegions(b1x, b1y, b1w, b1h, regions, count);
+
+  ClipRegion final[16];
+  int finalCount = 0;
+  for (int i = 0; i < count; i++) {
+    ClipRegion sub[4];
+    int subCount = 0;
+    getClipRegionAgainst(regions[i], b2x, b2y, b2w, b2h, sub, subCount);
+    for (int j = 0; j < subCount; j++)
+      final[finalCount++] = sub[j];
+  }
+
+  for (int i = 0; i < finalCount; i++) {
+    ClipRegion& r = final[i];
+    if (r.w > 0 && r.h > 0)
+      Locator::getDisplay()->drawRGBBitmap(r.x, r.y,
+        _sprite + r.sy * _width + r.sx, _mask + r.sy * _width + r.sx,
+        r.w, r.h);
+  }
+}
+
 void Cloud::init() {
   Locator::getEventBus()->subscribe(this);
   Locator::getDisplay()->drawRGBBitmap(_x, _y, _sprite, _mask, _width, _height);
@@ -74,14 +122,10 @@ void Cloud::init() {
 void Cloud::update() {
   unsigned long now = millis();
   if (now - _lastMillis >= _interval) {
-    // Clear old position with sky color
-    Locator::getDisplay()->fillRect(_x, _y, _width, _height, SKY_COLOR);
-    // Move one pixel left
+    clearOldPosition(13, 8, 19, 19, 32, 8, 19, 19);
     _x -= 1;
-    // Wrap around when fully off the left edge
     wrap();
-    // Redraw at new position with transparency mask
-    Locator::getDisplay()->drawRGBBitmap(_x, _y, _sprite, _mask, _width, _height);
+    drawClipped(13, 8, 19, 19, 32, 8, 19, 19);
     _lastMillis = now;
   }
 }
